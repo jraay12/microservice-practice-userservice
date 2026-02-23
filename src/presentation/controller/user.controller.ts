@@ -37,8 +37,7 @@ export class UserController {
         return res.status(400).json({ errors: error.flatten() });
       }
 
-      console.error(error);
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(500).json({ error: error.message });
     }
   };
 
@@ -52,8 +51,7 @@ export class UserController {
         return res.status(400).json({ errors: error.flatten() });
       }
 
-      console.error(error);
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(500).json({ error: error.message });
     }
   };
 
@@ -67,8 +65,7 @@ export class UserController {
         return res.status(400).json({ errors: error.flatten() });
       }
 
-      console.error(error);
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(500).json({ error: error.message });
     }
   };
 
