@@ -11,6 +11,11 @@ export class CreateUser {
 
   async execute(data: CreateUserDTO): Promise<UserResponseDTO> {
     const hashPassword = await this.passwordHasher.hashPassword(data.password);
+
+    const existingUser = await this.userRepository.findByEmail(data.email);
+
+    if (existingUser) throw new Error("Email already exists");
+
     const user = User.create({ ...data, password: hashPassword });
 
     await this.userRepository.save(user);
