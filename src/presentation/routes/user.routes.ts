@@ -16,6 +16,6 @@ const userController = new UserController(createUserUseCase, deactivateUser);
 const router = Router();
 
 router.post("/create", userController.create);
-router.post("/deactivate", userController.deactivate);
+router.post("/deactivate/:id", userController.deactivate);
 
 export default router;
