@@ -9,11 +9,12 @@ import {
   DeactivateUserSchema,
 } from "../../application/dto/DeactivateUserDTO";
 import { DeactivateUser } from "../../application/use-cases/DeactivateUser";
-
+import { ActivateUser } from "../../application/use-cases/ActivateUser";
 export class UserController {
   constructor(
     private createUser: CreateUser,
     private deactivateUser: DeactivateUser,
+    private activiateUser: ActivateUser,
   ) {}
 
   create = async (req: Request, res: Response) => {
@@ -37,6 +38,21 @@ export class UserController {
       const dto: DeactivateUserDTO = DeactivateUserSchema.parse(req.params);
       await this.deactivateUser.execute(dto);
       return res.status(200).json({ message: "successfully deactivated" });
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({ errors: error.errors });
+      }
+
+      console.log(error);
+      return res.status(500).json({ error: error.message });
+    }
+  };
+
+  activate = async (req: Request, res: Response) => {
+    try {
+      const dto = DeactivateUserSchema.parse(req.params);
+      await this.activiateUser.execute(dto);
+      return res.status(200).json({ message: "successfully activated" });
     } catch (error: any) {
       if (error.name === "ZodError") {
         return res.status(400).json({ errors: error.errors });
