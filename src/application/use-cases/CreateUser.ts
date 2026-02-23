@@ -3,6 +3,7 @@ import { UserResponseDTO } from "../dto/UserResponseDTO";
 import { UserRepository } from "../../domain/repositories/user.repositories";
 import { User } from "../../domain/entities/user";
 import { PasswordHasher } from "../../domain/service/PasswordHasher";
+import { ConflictError } from "../../shared/error/AppError";
 export class CreateUser {
   constructor(
     private userRepository: UserRepository,
@@ -14,7 +15,7 @@ export class CreateUser {
 
     const existingUser = await this.userRepository.findByEmail(data.email);
 
-    if (existingUser) throw new Error("Email already exists");
+    if (existingUser) throw new ConflictError("Email already exists");
 
     const user = User.create({ ...data, password: hashPassword });
 

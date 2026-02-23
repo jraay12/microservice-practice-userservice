@@ -1,4 +1,5 @@
 import { UserRepository } from "../../domain/repositories/user.repositories";
+import { NotFoundError } from "../../shared/error/AppError";
 import { DeactivateUserDTO } from "../dto/DeactivateUserDTO";
 
 export class DeactivateUser {
@@ -7,7 +8,7 @@ export class DeactivateUser {
   async execute(data: DeactivateUserDTO): Promise<void> {
     const user = await this.useRepository.findById(data.id);
 
-    if (!user) throw new Error("User doesn't exist!");
+    if (!user) throw new NotFoundError("User doesn't exist!");
 
     user.deactivate();
 

@@ -8,11 +8,12 @@ import { ActivateUser } from "../../application/use-cases/ActivateUser";
 import { UpdateUserInfo } from "../../application/use-cases/UpdateUseInfo";
 import { JWTServiceImpl } from "../../infrastructure/service/JWTServiceImpl";
 import { LoginUser } from "../../application/use-cases/LoginUser";
+import { NotFoundError } from "../../shared/error/AppError";
 
 const secret = process.env.ACCESS_TOKEN_SECRET;
 
 if (!secret) {
-  throw new Error(
+  throw new NotFoundError(
     "ACCESS_TOKEN_SECRET is not defined in environment variables",
   );
 }

@@ -1,5 +1,6 @@
 import { JWTService } from "../../domain/service/JwtService";
 import jwt from "jsonwebtoken";
+import { BadRequestError } from "../../shared/error/AppError";
 export class JWTServiceImpl implements JWTService {
   constructor(private readonly secret: string) {}
   async sign(payload: { id: string; role: string }): Promise<string> {
@@ -11,7 +12,7 @@ export class JWTServiceImpl implements JWTService {
     try {
       return jwt.verify(token, this.secret) as T;
     } catch (error) {
-      throw new Error("Invalid or expired token!");
+      throw new BadRequestError("Invalid or expired token!");
     }
   }
 }

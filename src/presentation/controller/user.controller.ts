@@ -1,4 +1,4 @@
-import { Response, Request, NextFunction } from "express";
+import { Response, Request } from "express";
 import { ZodError } from "zod";
 import { CreateUser } from "../../application/use-cases/CreateUser";
 import {
@@ -22,6 +22,8 @@ import {
   LoginUserDTO,
   LoginUserSchema,
 } from "../../application/dto/LoginUserDTO";
+import { AppError } from "../../shared/error/AppError";
+
 export class UserController {
   constructor(
     private createUser: CreateUser,
@@ -31,18 +33,26 @@ export class UserController {
     private loginUser: LoginUser,
   ) {}
 
+  private handleError(res: Response, error: any) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({ errors: error.flatten() });
+    }
+
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+
+    console.error(error); 
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+
   create = async (req: Request, res: Response) => {
     try {
       const dto: CreateUserDTO = CreateUserSchema.parse(req.body);
       const result = await this.createUser.execute(dto);
-
       return res.status(201).json(result);
     } catch (error: any) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({ errors: error.flatten() });
-      }
-
-      return res.status(500).json({ error: error.message });
+      return this.handleError(res, error);
     }
   };
 
@@ -50,27 +60,19 @@ export class UserController {
     try {
       const dto: DeactivateUserDTO = DeactivateUserSchema.parse(req.params);
       await this.deactivateUser.execute(dto);
-      return res.status(200).json({ message: "successfully deactivated" });
+      return res.status(200).json({ message: "Successfully deactivated" });
     } catch (error: any) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({ errors: error.flatten() });
-      }
-
-      return res.status(500).json({ error: error.message });
+      return this.handleError(res, error);
     }
   };
 
   activate = async (req: Request, res: Response) => {
     try {
-      const dto = DeactivateUserSchema.parse(req.params);
+      const dto: DeactivateUserDTO = DeactivateUserSchema.parse(req.params);
       await this.activiateUser.execute(dto);
-      return res.status(200).json({ message: "successfully activated" });
+      return res.status(200).json({ message: "Successfully activated" });
     } catch (error: any) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({ errors: error.flatten() });
-      }
-
-      return res.status(500).json({ error: error.message });
+      return this.handleError(res, error);
     }
   };
 
@@ -80,33 +82,21 @@ export class UserController {
       const dtoBody = UpdateUserBodySchema.parse(req.body);
       const dto: UpdateUserDTO = { id: dtoParams.id, ...dtoBody };
       const result = await this.updateInfo.execute(dto);
-      return res.status(200).json({
-        message: "Successfully updated",
-        data: result,
-      });
+      return res
+        .status(200)
+        .json({ message: "Successfully updated", data: result });
     } catch (error: any) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({ errors: error.flatten() });
-      }
-
-      return res.status(500).json({ error: error.message });
+      return this.handleError(res, error);
     }
   };
 
   login = async (req: Request, res: Response) => {
     try {
       const dto: LoginUserDTO = LoginUserSchema.parse(req.body);
-      const result = await this.loginUser.execute(dto);
-      return res.status(200).json({
-        message: "Successfully login",
-        token: result,
-      });
+      const token = await this.loginUser.execute(dto);
+      return res.status(200).json({ message: "Successfully login", token });
     } catch (error: any) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({ errors: error.flatten() });
-      }
-
-      return res.status(500).json({ error: error.message });
+      return this.handleError(res, error);
     }
   };
 }
