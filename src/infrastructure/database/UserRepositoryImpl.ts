@@ -59,4 +59,18 @@ export class UserRepositoryImpl implements UserRepository {
       },
     });
   }
+
+  async update(user: User): Promise<void> {
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        name: user.name,
+        email: user.email,
+        isActive: user.isActive,
+        updatedAt: user.updatedAt,
+      },
+    });
+  }
 }
