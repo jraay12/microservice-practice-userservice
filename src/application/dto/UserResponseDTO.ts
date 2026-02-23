@@ -4,6 +4,6 @@ export interface UserResponseDTO {
   email: string;
   role: "USER" | "ADMIN";
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
