@@ -13,11 +13,12 @@ import { authLimiter } from "../../infrastructure/http/middleware/rateLimiter";
 import { prisma } from "../../config/prisma";
 import { GetAllUserUsecase } from "../../application/use-cases/GetAllUser";
 
-const secret = process.env.ACCESS_TOKEN_SECRET;
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET
 
-if (!secret) {
+if (!accessTokenSecret || !refreshTokenSecret) {
   throw new NotFoundError(
-    "ACCESS_TOKEN_SECRET is not defined in environment variables",
+    "ACCESS_TOKEN_SECRET or REFRESH_TOKEN_SECRET is not defined in environment variables",
   );
 }
 
@@ -26,7 +27,7 @@ const userRepo = new UserRepositoryImpl(prisma);
 
 // service
 const bcryptPasswordHasher = new BcryptPasswordHasher();
-const jwtService = new JWTServiceImpl(secret);
+const jwtService = new JWTServiceImpl(accessTokenSecret, refreshTokenSecret);
 
 // use cases
 const createUserUseCase = new CreateUser(userRepo, bcryptPasswordHasher);
