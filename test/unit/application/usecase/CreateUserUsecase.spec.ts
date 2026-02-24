@@ -64,7 +64,7 @@ describe("CraeteUseCase", () => {
     await expect(
       createUser.execute({
         ...baseUserData,
-      password: "123"
+        password: "123",
       }),
     ).rejects.toThrow("Password must be at least 6 characters");
   });
