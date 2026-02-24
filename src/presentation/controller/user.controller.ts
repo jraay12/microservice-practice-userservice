@@ -23,8 +23,9 @@ import {
   LoginUserDTO,
   LoginUserSchema,
 } from "../../application/dto/LoginUserDTO";
-import { AppError } from "../../shared/error/AppError";
+import { AppError, UnAuthorizeError } from "../../shared/error/AppError";
 import { FindAllUsersSchema } from "../../application/dto/FindAllUserDTO";
+import { CreateNewAccessToken } from "../../application/use-cases/CreateNewAccessToken";
 
 export class UserController {
   constructor(
@@ -34,6 +35,7 @@ export class UserController {
     private updateInfo: UpdateUserInfo,
     private loginUser: LoginUser,
     private getAllUserUsecase: GetAllUserUsecase,
+    private createNewAccessToken: CreateNewAccessToken,
   ) {}
 
   private handleError(res: Response, error: any) {
@@ -117,6 +119,20 @@ export class UserController {
       const users = await this.getAllUserUsecase.execute({ skip, take });
       return res.status(200).json({ data: users });
     } catch (error: any) {
+      return this.handleError(res, error);
+    }
+  };
+
+  refresh = async (req: Request, res: Response) => {
+    try {
+      const refreshToken = req.cookies.refreshToken;
+      
+      if (!refreshToken) throw new UnAuthorizeError("Refresh Token is missing");
+
+      const result = await this.createNewAccessToken.execute(refreshToken);
+      return res.status(200).json(result);
+    } catch (error: any) {
+      console.log(error)
       return this.handleError(res, error);
     }
   };

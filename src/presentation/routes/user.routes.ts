@@ -12,9 +12,9 @@ import { NotFoundError } from "../../shared/error/AppError";
 import { authLimiter } from "../../infrastructure/http/middleware/rateLimiter";
 import { prisma } from "../../config/prisma";
 import { GetAllUserUsecase } from "../../application/use-cases/GetAllUser";
-
+import { CreateNewAccessToken } from "../../application/use-cases/CreateNewAccessToken";
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET
+const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 
 if (!accessTokenSecret || !refreshTokenSecret) {
   throw new NotFoundError(
@@ -36,6 +36,7 @@ const activateUser = new ActivateUser(userRepo);
 const updateUserInfo = new UpdateUserInfo(userRepo);
 const loginUser = new LoginUser(userRepo, bcryptPasswordHasher, jwtService);
 const getAllUser = new GetAllUserUsecase(userRepo);
+const createNewAccessToken = new CreateNewAccessToken(jwtService);
 // controller
 const userController = new UserController(
   createUserUseCase,
@@ -44,6 +45,7 @@ const userController = new UserController(
   updateUserInfo,
   loginUser,
   getAllUser,
+  createNewAccessToken,
 );
 
 const router = Router();
@@ -54,4 +56,5 @@ router.patch("/activate/:id", userController.activate);
 router.patch("/update/:id", userController.update);
 router.post("/login", authLimiter, userController.login);
 router.get("/findAll", userController.findAll);
+router.post("/refresh", authLimiter, userController.refresh);
 export default router;
