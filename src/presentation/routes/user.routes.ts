@@ -10,6 +10,7 @@ import { JWTServiceImpl } from "../../infrastructure/service/JWTServiceImpl";
 import { LoginUser } from "../../application/use-cases/LoginUser";
 import { NotFoundError } from "../../shared/error/AppError";
 import { authLimiter } from "../../infrastructure/http/middleware/rateLimiter";
+import { prisma } from "../../config/prisma";
 const secret = process.env.ACCESS_TOKEN_SECRET;
 
 if (!secret) {
@@ -19,7 +20,7 @@ if (!secret) {
 }
 
 // database
-const userRepo = new UserRepositoryImpl();
+const userRepo = new UserRepositoryImpl(prisma);
 
 // service
 const bcryptPasswordHasher = new BcryptPasswordHasher();

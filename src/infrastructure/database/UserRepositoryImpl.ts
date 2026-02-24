@@ -1,11 +1,13 @@
 import { User } from "../../domain/entities/user";
 import { UserRepository } from "../../domain/repositories/user.repositories";
-import { prisma } from "../../config/prisma";
 import { UserRole } from "../../domain/entities/user";
+import { PrismaClient } from "@prisma/client";
 
 export class UserRepositoryImpl implements UserRepository {
+  constructor(private prisma: PrismaClient) {}
+
   async findByEmail(email: string): Promise<User | null> {
-    const user = await prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         email,
       },
@@ -26,7 +28,7 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   async findById(id: string): Promise<User | null> {
-    const user = await prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
@@ -46,7 +48,7 @@ export class UserRepositoryImpl implements UserRepository {
     });
   }
   async save(user: User): Promise<void> {
-    await prisma.user.create({
+    await this.prisma.user.create({
       data: {
         email: user.email,
         name: user.name,
@@ -61,7 +63,7 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   async update(user: User): Promise<void> {
-    await prisma.user.update({
+    await this.prisma.user.update({
       where: {
         id: user.id,
       },
