@@ -11,6 +11,8 @@ import { LoginUser } from "../../application/use-cases/LoginUser";
 import { NotFoundError } from "../../shared/error/AppError";
 import { authLimiter } from "../../infrastructure/http/middleware/rateLimiter";
 import { prisma } from "../../config/prisma";
+import { GetAllUserUsecase } from "../../application/use-cases/GetAllUser";
+
 const secret = process.env.ACCESS_TOKEN_SECRET;
 
 if (!secret) {
@@ -32,6 +34,7 @@ const deactivateUser = new DeactivateUser(userRepo);
 const activateUser = new ActivateUser(userRepo);
 const updateUserInfo = new UpdateUserInfo(userRepo);
 const loginUser = new LoginUser(userRepo, bcryptPasswordHasher, jwtService);
+const getAllUser = new GetAllUserUsecase(userRepo);
 // controller
 const userController = new UserController(
   createUserUseCase,
@@ -39,6 +42,7 @@ const userController = new UserController(
   activateUser,
   updateUserInfo,
   loginUser,
+  getAllUser,
 );
 
 const router = Router();
@@ -48,4 +52,5 @@ router.patch("/deactivate/:id", userController.deactivate);
 router.patch("/activate/:id", userController.activate);
 router.patch("/update/:id", userController.update);
 router.post("/login", authLimiter, userController.login);
+router.get("/findAll", userController.findAll);
 export default router;

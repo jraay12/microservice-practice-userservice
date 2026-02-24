@@ -75,4 +75,27 @@ export class UserRepositoryImpl implements UserRepository {
       },
     });
   }
+
+  async findAll(skip: number, take: number): Promise<User[]> {
+    const user = await this.prisma.user.findMany({
+      skip,
+      take,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return user.map((u) =>
+      User.rehydrate({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        password: u.password,
+        role: u.role as UserRole,
+        isActive: u.isActive,
+        createdAt: u.createdAt,
+        updatedAt: u.updatedAt,
+      }),
+    );
+  }
 }

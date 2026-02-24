@@ -1,3 +1,4 @@
+import { GetAllUserUsecase } from "./../../application/use-cases/GetAllUser";
 import { Response, Request } from "express";
 import { ZodError } from "zod";
 import { CreateUser } from "../../application/use-cases/CreateUser";
@@ -23,6 +24,7 @@ import {
   LoginUserSchema,
 } from "../../application/dto/LoginUserDTO";
 import { AppError } from "../../shared/error/AppError";
+import { FindAllUsersSchema } from "../../application/dto/FindAllUserDTO";
 
 export class UserController {
   constructor(
@@ -31,6 +33,7 @@ export class UserController {
     private activiateUser: ActivateUser,
     private updateInfo: UpdateUserInfo,
     private loginUser: LoginUser,
+    private getAllUserUsecase: GetAllUserUsecase,
   ) {}
 
   private handleError(res: Response, error: any) {
@@ -94,6 +97,16 @@ export class UserController {
       const dto: LoginUserDTO = LoginUserSchema.parse(req.body);
       const token = await this.loginUser.execute(dto);
       return res.status(200).json({ message: "Successfully login", token });
+    } catch (error: any) {
+      return this.handleError(res, error);
+    }
+  };
+
+  findAll = async (req: Request, res: Response) => {
+    try {
+      const { skip, take } = FindAllUsersSchema.parse(req.query);
+      const users = await this.getAllUserUsecase.execute({ skip, take });
+      return res.status(200).json({ data: users });
     } catch (error: any) {
       return this.handleError(res, error);
     }
