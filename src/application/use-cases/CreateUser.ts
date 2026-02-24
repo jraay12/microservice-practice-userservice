@@ -11,13 +11,15 @@ export class CreateUser {
   ) {}
 
   async execute(data: CreateUserDTO): Promise<UserResponseDTO> {
-    const hashPassword = await this.passwordHasher.hashPassword(data.password);
-
     const existingUser = await this.userRepository.findByEmail(data.email);
 
     if (existingUser) throw new ConflictError("Email already exists");
 
-    const user = User.create({ ...data, password: hashPassword });
+    const user = User.create(data);
+
+    const hashPassword = await this.passwordHasher.hashPassword(data.password);
+
+    user.updatePassword(hashPassword);
 
     await this.userRepository.save(user);
 

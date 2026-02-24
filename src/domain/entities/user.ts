@@ -112,6 +112,10 @@ export class User {
     this.touch();
   }
 
+  updatePassword(hashPassword: string) {
+    this._password = hashPassword;
+  }
+
   changePassword(newPassword: string) {
     if (newPassword.length < 6) {
       throw new Error("Password must be at least 6 characters");
