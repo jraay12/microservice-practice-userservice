@@ -42,7 +42,6 @@ export class UserController {
       return res.status(error.statusCode).json({ error: error.message });
     }
 
-    console.error(error); 
     return res.status(500).json({ error: "Internal Server Error" });
   }
 

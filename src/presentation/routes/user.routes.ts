@@ -9,7 +9,7 @@ import { UpdateUserInfo } from "../../application/use-cases/UpdateUseInfo";
 import { JWTServiceImpl } from "../../infrastructure/service/JWTServiceImpl";
 import { LoginUser } from "../../application/use-cases/LoginUser";
 import { NotFoundError } from "../../shared/error/AppError";
-
+import { authLimiter } from "../../infrastructure/http/middleware/rateLimiter";
 const secret = process.env.ACCESS_TOKEN_SECRET;
 
 if (!secret) {
@@ -42,9 +42,9 @@ const userController = new UserController(
 
 const router = Router();
 
-router.post("/create", userController.create);
+router.post("/create", authLimiter, userController.create);
 router.patch("/deactivate/:id", userController.deactivate);
 router.patch("/activate/:id", userController.activate);
 router.patch("/update/:id", userController.update);
-router.post("/login", userController.login);
+router.post("/login", authLimiter, userController.login);
 export default router;
