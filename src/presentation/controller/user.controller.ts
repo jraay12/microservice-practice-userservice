@@ -95,8 +95,17 @@ export class UserController {
   login = async (req: Request, res: Response) => {
     try {
       const dto: LoginUserDTO = LoginUserSchema.parse(req.body);
-      const token = await this.loginUser.execute(dto);
-      return res.status(200).json({ message: "Successfully login", token });
+      const { accessToken, refreshToken } = await this.loginUser.execute(dto);
+
+      return res
+        .status(200)
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        })
+        .json({ message: "Successfully login", accessToken });
     } catch (error: any) {
       return this.handleError(res, error);
     }

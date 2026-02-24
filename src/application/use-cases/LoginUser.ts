@@ -3,6 +3,7 @@ import { JWTService } from "../../domain/service/JwtService";
 import { BcryptPasswordHasher } from "../../infrastructure/service/BcryptPasswordHasher";
 import { BadRequestError, NotFoundError } from "../../shared/error/AppError";
 import { LoginUserDTO } from "../dto/LoginUserDTO";
+import { LoginUserResponseDTO } from "../dto/LoginUserResponseDTO";
 
 export class LoginUser {
   constructor(
@@ -11,7 +12,7 @@ export class LoginUser {
     private jwtService: JWTService,
   ) {}
 
-  async execute(data: LoginUserDTO): Promise<string> {
+  async execute(data: LoginUserDTO): Promise<LoginUserResponseDTO> {
     const user = await this.userRepo.findByEmail(data.email);
 
     if (!user) throw new NotFoundError("Email address doesn't exist!");
@@ -23,6 +24,6 @@ export class LoginUser {
 
     if (!match) throw new BadRequestError("Invalid credentials!");
 
-    return await this.jwtService.sign({ id: user.id, role: user.role });
+    return await this.jwtService.generateTokens({ id: user.id, role: user.role });
   }
 }

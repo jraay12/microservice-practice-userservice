@@ -83,6 +83,9 @@ export class UserRepositoryImpl implements UserRepository {
       orderBy: {
         createdAt: "desc",
       },
+      where: {
+        isActive: true,
+      },
     });
 
     return user.map((u) =>
